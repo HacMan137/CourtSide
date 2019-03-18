@@ -1,16 +1,51 @@
 import urllib.request
 import re
+import json
+import os
 
 class NCAAMBB():
     def __init__(self):
         self.baseurl = "https://www.teamrankings.com/ncaa-basketball/stat/"
+    
+    def getCachedStat(self,stat,team,year="current"):
+        try:
+            with open("./data.json","r") as f:
+                dataDict = json.load(f)
+            return dataDict[team][year][stat]
+        except Exception as e:
+###            print("Exception in getCachedStat: %s" % e)
+            return -999
+
+    def cacheStat(self,stat,team,value,year="current"):
+        if(os.path.isfile("./data.json")):
+            with open("./data.json","r") as f:
+                dataDict = json.load(f)
+                f.close()
+        else:
+            dataDict = {}
+        if team not in dataDict:
+            dataDict[team] = {}
+            dataDict[team][year] = {}
+        dataDict[team][year][stat] = value
+        with open("./data.json","w") as fp:
+            json.dump(dataDict,fp)
+            fp.close()
 
     def searchTeam(self,team):
         pass
 
-    def makeRequest(self,url,team,year=""):
+    def makeRequest(self,statistic,team,year=""):
+        #Check to see if we have this stat cached
+        if(year==""):
+            cache = self.getCachedStat(statistic,team)
+        else:
+            cache = self.getCachedStat(statistic,team,year)
+        #If stat is cached return thast
+        if(cache!=-999):
+            return str(cache)
+        #Otherwise
         try:
-            url = self.baseurl + url
+            url = self.baseurl + statistic
             if(len(year)>3):
                 url+="?date="+year+"-04-04"
             response = urllib.request.urlopen(url)
@@ -21,8 +56,14 @@ class NCAAMBB():
                     stat = datalines[i+1].decode()
                     stat.replace("\t","")
                     final = re.search(">\-*\+*[0-9]*\.*[0-9]*\%*",stat)
-                    return (final.group(0)[1:]).replace("%","")
-        except:
+                    result = (final.group(0)[1:]).replace("%","")
+                    if(year!=""):
+                        self.cacheStat(statistic,team,result,year)
+                    else:
+                        self.cacheStat(statistic,team,result)
+                    return result
+        except Exception as e:
+            print(e)
             return -1
 
     def getPPG(self,team,year=""):
