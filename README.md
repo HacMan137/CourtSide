@@ -38,6 +38,8 @@ Michigan St
 ~~~~
 This is useful because winners.txt could then be used as the matchup file for the next round of a tournament
 
-## Checklist
+## Features for the Future
+[ ] Caching system to reduce redundant web calls
+[ ] Support for running an entire competition at once, not just a single round
 [ ] Complete function to search for a team
 
