@@ -21,7 +21,7 @@ class NCAAMBB():
                     stat = datalines[i+1].decode()
                     stat.replace("\t","")
                     final = re.search(">\-*\+*[0-9]*\.*[0-9]*\%*",stat)
-                    return (final.group(0)[1:])
+                    return (final.group(0)[1:]).replace("%","")
         except:
             return -1
 
@@ -718,5 +718,4 @@ class NCAAMBB():
 
         
         
-##myFinder = NCAAMBB()
-##print(myFinder.getOppCloseWinPercent("Michigan St","2018"))
+myFinder = NCAAMBB()
