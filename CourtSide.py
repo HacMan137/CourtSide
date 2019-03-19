@@ -42,7 +42,7 @@ class NCAAMBB():
             cache = self.getCachedStat(statistic,team,year)
         #If stat is cached return thast
         if(cache!=-999):
-            return str(cache)
+            return float(cache)
         #Otherwise
         try:
             url = self.baseurl + statistic
@@ -61,7 +61,7 @@ class NCAAMBB():
                         self.cacheStat(statistic,team,result,year)
                     else:
                         self.cacheStat(statistic,team,result)
-                    return result
+                    return float(result)
         except Exception as e:
             print(e)
             return -1
