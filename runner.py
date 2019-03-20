@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import CourtSide
 import sys
-import algorithms.alg1 as alg
+import algorithms.alg8 as alg
 
 if(len(sys.argv)<2):
     print("Usage: %s <match up file>" % (sys.argv[0]))

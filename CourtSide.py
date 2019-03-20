@@ -2,6 +2,7 @@ import urllib.request
 import re
 import json
 import os
+import datetime
 
 class NCAAMBB():
     def __init__(self):
@@ -756,6 +757,52 @@ class NCAAMBB():
             return self.makeRequest("opponent-win-pct-close-games",team,year)
         except:
             return -1
+
+    def getStrengthOfSchedule(self,team,year=""):
+        statistic = "Strength of Schedule"
+        try:
+            url = "https://www.teamrankings.com/ncaa-basketball/ranking/schedule-strength-by-other"
+            if(len(year)>3):
+                url+="?date="+year+"-04-04"
+            response = urllib.request.urlopen(url)
+            data = response.read()
+            datalines = data.split(b"\n")
+            for i in range(len(datalines)-1):
+                if(b"\"" + team.encode() + b"\"" in datalines[i]):
+                    stat = datalines[i+1].decode()
+                    stat.replace("\t","")
+                    final = re.search(">\-*\+*[0-9]*\.*[0-9]*\%*",stat)
+                    result = (final.group(0)[1:]).replace("%","")
+                    if(year!=""):
+                        self.cacheStat(statistic,team,result,year)
+                    else:
+                        self.cacheStat(statistic,team,result)
+                    return float(result)
+        except Exception as e:
+            print("Exception: %s" % e)
+            return -1
+
+    def getMaxStrengthOfSchedule(self,year=""):
+        if(year==""):
+            year = str(datetime.datetime.now().year)
+        try:
+            url = "https://www.teamrankings.com/ncaa-basketball/ranking/schedule-strength-by-other"
+            if(len(year)>3):
+                url+="?date="+year+"-04-04"
+            response = urllib.request.urlopen(url)
+            data = response.read()
+            datalines = data.split(b"\n")
+            for i in range(len(datalines)-1):
+                if(b"data-sort=\"001\"" in datalines[i]):
+                    stat = datalines[i+2].decode()
+                    stat.replace("\t","")
+                    final = re.search(">\-*\+*[0-9]*\.*[0-9]*\%*",stat)
+                    result = (final.group(0)[1:]).replace("%","")
+                    return float(result)
+        except Exception as e:
+            print("Exception: %s" % e)
+            return -1
+
 
         
         
